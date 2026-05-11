@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Loader2, Plus, Upload, X } from "lucide-react";
+import { FileText, Loader2, Plus, Upload, X } from "lucide-react";
 import { NavBar } from "@/components/NavBar";
 import { Button } from "@/components/ui/button";
 import { Charts } from "@/components/Charts";
+import { PdfPreviewDialog } from "@/components/PdfPreviewDialog";
 import { cleanDataset, parseFile, type Dataset } from "@/lib/dataset";
 
 const MAX = 3;
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/compare")({
 function ComparePage() {
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [loading, setLoading] = useState(false);
+  const [pdfIndex, setPdfIndex] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const onFiles = async (files: FileList | null) => {
@@ -108,11 +110,14 @@ function ComparePage() {
                       {ds.rows.length} rows · {ds.columns.length} cols
                     </p>
                   </div>
+                  <Button variant="outline" size="sm" onClick={() => setPdfIndex(i)}>
+                    <FileText className="h-4 w-4" /> PDF
+                  </Button>
                   <Button variant="ghost" size="icon" onClick={() => remove(i)}>
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
-                <div className="[&_.grid]:grid-cols-1">
+                <div data-compare-charts={i} className="[&_.grid]:grid-cols-1">
                   <Charts dataset={ds} />
                 </div>
               </div>
@@ -120,6 +125,15 @@ function ComparePage() {
           </div>
         )}
       </main>
+
+      {pdfIndex !== null && datasets[pdfIndex] && (
+        <PdfPreviewDialog
+          open={pdfIndex !== null}
+          onOpenChange={(v) => !v && setPdfIndex(null)}
+          dataset={datasets[pdfIndex]}
+          chartsSelector={`[data-compare-charts="${pdfIndex}"]`}
+        />
+      )}
     </div>
   );
 }
