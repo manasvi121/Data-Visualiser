@@ -1,12 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Bookmark, FileDown, Loader2 } from "lucide-react";
 import { NavBar } from "@/components/NavBar";
 import { FileUpload } from "@/components/FileUpload";
 import { Charts } from "@/components/Charts";
 import { Chatbot } from "@/components/Chatbot";
 import { PdfPreviewDialog } from "@/components/PdfPreviewDialog";
 import { Button } from "@/components/ui/button";
-import { FileDown } from "lucide-react";
+import { datasetStore, useDataset } from "@/lib/dataset-store";
+import { useAuth } from "@/hooks/use-auth";
+import { saveVisualisation } from "@/lib/history";
 import type { Dataset } from "@/lib/dataset";
 
 export const Route = createFileRoute("/workspace")({
@@ -24,8 +28,34 @@ export const Route = createFileRoute("/workspace")({
 });
 
 function Workspace() {
-  const [dataset, setDataset] = useState<Dataset | null>(null);
+  const stored = useDataset();
+  const [dataset, setDataset] = useState<Dataset | null>(stored);
   const [pdfOpen, setPdfOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (stored && stored !== dataset) setDataset(stored);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stored]);
+
+  const onLoaded = (ds: Dataset) => {
+    setDataset(ds);
+    datasetStore.set(ds);
+  };
+
+  const save = async () => {
+    if (!dataset || !user) return;
+    setSaving(true);
+    try {
+      await saveVisualisation(user.id, dataset);
+      toast.success("Saved to History");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not save");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-hero">
@@ -44,16 +74,20 @@ function Workspace() {
               the AI analyst answer your questions.
             </p>
           </div>
-          <Button
-            variant="hero"
-            disabled={!dataset}
-            onClick={() => setPdfOpen(true)}
-          >
-            <FileDown className="h-4 w-4" /> Presentation-ready PDF
-          </Button>
+          <div className="flex gap-2 flex-wrap">
+            {user && (
+              <Button variant="outline" disabled={!dataset || saving} onClick={save}>
+                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bookmark className="h-4 w-4" />}
+                Save to History
+              </Button>
+            )}
+            <Button variant="hero" disabled={!dataset} onClick={() => setPdfOpen(true)}>
+              <FileDown className="h-4 w-4" /> Presentation-ready PDF
+            </Button>
+          </div>
         </div>
 
-        <FileUpload onLoaded={setDataset} />
+        <FileUpload onLoaded={onLoaded} />
 
         {dataset && (
           <>
