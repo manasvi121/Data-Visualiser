@@ -82,7 +82,7 @@ function Home() {
         </section>
       </main>
       <footer className="border-t border-border/40 py-8 text-center text-xs text-muted-foreground">
-        Built with Lovable AI · Black · Purple · White
+        Built with Lovable AI · Moonlight · Oxford Blue
       </footer>
     </div>
   );

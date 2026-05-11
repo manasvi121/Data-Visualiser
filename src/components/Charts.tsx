@@ -34,7 +34,7 @@ const COLORS = [
 ];
 
 const tooltipStyle = {
-  background: "oklch(0.10 0.025 280)",
+  background: "oklch(0.22 0.06 255)",
   border: "1px solid oklch(0.30 0.10 295 / 0.4)",
   borderRadius: 8,
   color: "white",
@@ -82,9 +82,9 @@ export function Charts({ dataset }: { dataset: Dataset }) {
       <ChartCard title={`Top ${barCol}`} subtitle="Most frequent values">
         <ResponsiveContainer>
           <BarChart data={barData}>
-            <CartesianGrid stroke="oklch(0.25 0.05 290 / 0.3)" />
-            <XAxis dataKey="name" stroke="oklch(0.7 0.03 280)" fontSize={11} />
-            <YAxis stroke="oklch(0.7 0.03 280)" fontSize={11} />
+            <CartesianGrid stroke="oklch(0.55 0.08 240 / 0.3)" />
+            <XAxis dataKey="name" stroke="oklch(0.78 0.03 235)" fontSize={11} />
+            <YAxis stroke="oklch(0.78 0.03 235)" fontSize={11} />
             <Tooltip contentStyle={tooltipStyle} />
             <Bar dataKey="value" fill="oklch(0.65 0.25 300)" radius={[6, 6, 0, 0]} />
           </BarChart>
@@ -119,16 +119,16 @@ export function Charts({ dataset }: { dataset: Dataset }) {
         {histCol ? (
           <ResponsiveContainer>
             <LineChart data={histData}>
-              <CartesianGrid stroke="oklch(0.25 0.05 290 / 0.3)" />
-              <XAxis dataKey="name" stroke="oklch(0.7 0.03 280)" fontSize={11} />
-              <YAxis stroke="oklch(0.7 0.03 280)" fontSize={11} />
+              <CartesianGrid stroke="oklch(0.55 0.08 240 / 0.3)" />
+              <XAxis dataKey="name" stroke="oklch(0.78 0.03 235)" fontSize={11} />
+              <YAxis stroke="oklch(0.78 0.03 235)" fontSize={11} />
               <Tooltip contentStyle={tooltipStyle} />
               <Line
                 type="monotone"
                 dataKey="value"
-                stroke="oklch(0.78 0.20 320)"
+                stroke="oklch(0.85 0.06 235)"
                 strokeWidth={2.5}
-                dot={{ fill: "oklch(0.78 0.20 320)" }}
+                dot={{ fill: "oklch(0.85 0.06 235)" }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -144,11 +144,11 @@ export function Charts({ dataset }: { dataset: Dataset }) {
         {scatter.length > 0 ? (
           <ResponsiveContainer>
             <ScatterChart>
-              <CartesianGrid stroke="oklch(0.25 0.05 290 / 0.3)" />
-              <XAxis dataKey="x" name={sx} stroke="oklch(0.7 0.03 280)" fontSize={11} />
-              <YAxis dataKey="y" name={sy} stroke="oklch(0.7 0.03 280)" fontSize={11} />
+              <CartesianGrid stroke="oklch(0.55 0.08 240 / 0.3)" />
+              <XAxis dataKey="x" name={sx} stroke="oklch(0.78 0.03 235)" fontSize={11} />
+              <YAxis dataKey="y" name={sy} stroke="oklch(0.78 0.03 235)" fontSize={11} />
               <Tooltip contentStyle={tooltipStyle} cursor={{ strokeDasharray: "3 3" }} />
-              <Scatter data={scatter} fill="oklch(0.70 0.22 310)" />
+              <Scatter data={scatter} fill="oklch(0.70 0.10 240)" />
             </ScatterChart>
           </ResponsiveContainer>
         ) : (
