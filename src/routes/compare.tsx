@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Loader2, Plus, Upload, X } from "lucide-react";
+import { FileText, Loader2, Plus, Upload, X } from "lucide-react";
 import { NavBar } from "@/components/NavBar";
 import { Button } from "@/components/ui/button";
 import { Charts } from "@/components/Charts";
+import { PdfPreviewDialog } from "@/components/PdfPreviewDialog";
 import { cleanDataset, parseFile, type Dataset } from "@/lib/dataset";
 
 const MAX = 3;
