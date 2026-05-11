@@ -30,7 +30,7 @@ export function Chatbot({ dataset }: { dataset: Dataset }) {
     [summary],
   );
   const { messages, sendMessage, status, error } = useChat({
-    id: "dataset-chat",
+    id: `dataset-chat:${dataset.fileName}`,
     transport,
   });
   const [input, setInput] = useState("");
