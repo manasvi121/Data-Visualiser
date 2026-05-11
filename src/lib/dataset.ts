@@ -177,15 +177,43 @@ export function numericSummary(ds: Dataset, column: string) {
   const sum = vals.reduce((a, b) => a + b, 0);
   const mean = sum / vals.length;
   const median = sorted[Math.floor(sorted.length / 2)];
+  const q = (p: number) => sorted[Math.min(sorted.length - 1, Math.floor(p * sorted.length))];
+  const variance = vals.reduce((a, b) => a + (b - mean) ** 2, 0) / vals.length;
+  const stddev = Math.sqrt(variance);
+  const r = (n: number) => Math.round(n * 1000) / 1000;
+  const nulls = ds.rows.length - vals.length;
   return {
     column,
     count: vals.length,
-    min: sorted[0],
-    max: sorted[sorted.length - 1],
-    mean: Math.round(mean * 100) / 100,
-    median,
-    sum: Math.round(sum * 100) / 100,
+    missing: nulls,
+    min: r(sorted[0]),
+    max: r(sorted[sorted.length - 1]),
+    mean: r(mean),
+    median: r(median),
+    stddev: r(stddev),
+    q1: r(q(0.25)),
+    q3: r(q(0.75)),
+    sum: r(sum),
   };
+}
+
+export function pearsonCorrelation(ds: Dataset, a: string, b: string): number | null {
+  const pairs = ds.rows
+    .map((r) => [r[a], r[b]])
+    .filter(([x, y]) => typeof x === "number" && typeof y === "number") as [number, number][];
+  if (pairs.length < 3) return null;
+  const n = pairs.length;
+  const mx = pairs.reduce((s, [x]) => s + x, 0) / n;
+  const my = pairs.reduce((s, [, y]) => s + y, 0) / n;
+  let num = 0, dx = 0, dy = 0;
+  for (const [x, y] of pairs) {
+    num += (x - mx) * (y - my);
+    dx += (x - mx) ** 2;
+    dy += (y - my) ** 2;
+  }
+  const den = Math.sqrt(dx * dy);
+  if (!den) return null;
+  return Math.round((num / den) * 1000) / 1000;
 }
 
 export function histogramBins(ds: Dataset, column: string, bins = 10) {
