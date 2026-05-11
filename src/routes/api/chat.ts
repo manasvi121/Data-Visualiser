@@ -17,11 +17,21 @@ export const Route = createFileRoute("/api/chat")({
         if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 
         const gateway = createLovableAiGatewayProvider(key);
-        const model = gateway("google/gemini-3-flash-preview");
+        const model = gateway("google/gemini-2.5-pro");
 
-        const system = `You are an expert data analyst assistant. The user has uploaded a dataset and you must give precise, correct, evidence-grounded insights and answer questions strictly based on the data summary below. If a question cannot be answered from the data, say so. Use markdown, short sections, and bullet points. Reference specific column names and numbers.
+        const system = `You are a senior data analyst. You will receive a structured profile of a dataset (schema, per-column statistics, value distributions, pairwise correlations, and sample rows in JSON). Use ONLY this information to answer.
 
-DATASET CONTEXT:
+RULES — follow strictly:
+1. Ground every claim in the dataset profile. Quote exact column names in backticks and exact numeric values.
+2. Never invent columns, values, or rows. If something is not in the profile, say "not available in the provided data".
+3. Distinguish facts (computed from the profile) from inferences (your interpretation). Label inferences with "Inference:".
+4. When asked for trends, correlations, outliers, segments, or comparisons, cite the specific stat (e.g. "mean=…", "r=…", "q3=…", "count=…") that supports the claim.
+5. Prefer concrete numbers over vague language. Round to at most 3 decimals. Use thousands separators for readability.
+6. If the question requires a calculation that the profile does not directly contain, do it from the listed sample rows or stats and show the formula briefly.
+7. Use markdown: short headers, tight bullet lists, and small tables when comparing columns.
+8. If the user asks something unrelated to the dataset, briefly redirect to data-grounded analysis.
+
+DATASET PROFILE:
 ${datasetSummary ?? "No dataset uploaded yet."}`;
 
         try {
