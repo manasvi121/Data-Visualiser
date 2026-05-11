@@ -28,7 +28,7 @@ ${datasetSummary ?? "No dataset uploaded yet."}`;
           const result = streamText({
             model,
             system,
-            messages: convertToModelMessages(messages as UIMessage[]),
+            messages: await convertToModelMessages(messages as UIMessage[]),
           });
           return result.toUIMessageStreamResponse({
             originalMessages: messages as UIMessage[],
