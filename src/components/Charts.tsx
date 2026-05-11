@@ -35,7 +35,7 @@ const COLORS = [
 
 const tooltipStyle = {
   background: "oklch(0.22 0.06 255)",
-  border: "1px solid oklch(0.30 0.10 295 / 0.4)",
+  border: "1px solid oklch(0.55 0.08 240 / 0.4)",
   borderRadius: 8,
   color: "white",
 };
