@@ -244,28 +244,59 @@ export function scatterData(ds: Dataset, x: string, y: string) {
 
 export function buildDatasetSummary(ds: Dataset): string {
   const lines: string[] = [];
-  lines.push(`Dataset: ${ds.fileName}`);
-  lines.push(`Rows: ${ds.rows.length}, Columns: ${ds.columns.length}`);
-  lines.push(`Columns: ${ds.columns.join(", ")}`);
-  lines.push(`Numeric: ${ds.numericColumns.join(", ") || "none"}`);
-  lines.push(`Categorical: ${ds.categoricalColumns.join(", ") || "none"}`);
+  lines.push(`# Dataset Profile`);
+  lines.push(`File: ${ds.fileName}`);
+  lines.push(`Total rows: ${ds.rows.length}`);
+  lines.push(`Total columns: ${ds.columns.length}`);
+  lines.push(`All columns (in order): ${ds.columns.join(" | ")}`);
+  lines.push(`Numeric columns (${ds.numericColumns.length}): ${ds.numericColumns.join(", ") || "none"}`);
+  lines.push(`Categorical columns (${ds.categoricalColumns.length}): ${ds.categoricalColumns.join(", ") || "none"}`);
+  lines.push(`Cleaning report: ${ds.cleaningReport.duplicatesRemoved} duplicates removed, ${ds.cleaningReport.missingFilled} missing values filled, ${ds.cleaningReport.numericCoerced} numeric coercions.`);
   lines.push("");
-  lines.push("Numeric summaries:");
-  for (const c of ds.numericColumns.slice(0, 8)) {
+
+  lines.push("## Numeric column statistics");
+  for (const c of ds.numericColumns) {
     const s = numericSummary(ds, c);
     if (s)
       lines.push(
-        `- ${c}: min=${s.min}, max=${s.max}, mean=${s.mean}, median=${s.median}, count=${s.count}`,
+        `- ${c}: count=${s.count}, missing=${s.missing}, min=${s.min}, q1=${s.q1}, median=${s.median}, q3=${s.q3}, max=${s.max}, mean=${s.mean}, stddev=${s.stddev}, sum=${s.sum}`,
       );
   }
   lines.push("");
-  lines.push("Top categories:");
-  for (const c of ds.categoricalColumns.slice(0, 5)) {
-    const top = topCategoryCounts(ds, c, 5);
-    lines.push(`- ${c}: ${top.map((t) => `${t.name}(${t.value})`).join(", ")}`);
+
+  lines.push("## Categorical value distributions");
+  for (const c of ds.categoricalColumns) {
+    const top = topCategoryCounts(ds, c, 12);
+    const uniq = new Set(ds.rows.map((r) => String(r[c] ?? "Unknown"))).size;
+    lines.push(
+      `- ${c} (unique=${uniq}): ${top.map((t) => `"${t.name}"=${t.value}`).join(", ")}${uniq > top.length ? ` …+${uniq - top.length} more` : ""}`,
+    );
   }
   lines.push("");
-  lines.push("First 5 rows (JSON):");
-  lines.push(JSON.stringify(ds.rows.slice(0, 5)));
+
+  if (ds.numericColumns.length >= 2) {
+    lines.push("## Pairwise correlations (Pearson r)");
+    const pairs: { a: string; b: string; r: number }[] = [];
+    for (let i = 0; i < ds.numericColumns.length; i++) {
+      for (let j = i + 1; j < ds.numericColumns.length; j++) {
+        const r = pearsonCorrelation(ds, ds.numericColumns[i], ds.numericColumns[j]);
+        if (r !== null) pairs.push({ a: ds.numericColumns[i], b: ds.numericColumns[j], r });
+      }
+    }
+    pairs.sort((x, y) => Math.abs(y.r) - Math.abs(x.r));
+    for (const p of pairs.slice(0, 15)) lines.push(`- ${p.a} vs ${p.b}: r=${p.r}`);
+    lines.push("");
+  }
+
+  const sampleSize = Math.min(20, ds.rows.length);
+  lines.push(`## Sample rows (first ${sampleSize} of ${ds.rows.length}, JSON)`);
+  lines.push(JSON.stringify(ds.rows.slice(0, sampleSize)));
+
+  if (ds.rows.length > sampleSize) {
+    const lastN = Math.min(5, ds.rows.length - sampleSize);
+    lines.push(`## Last ${lastN} rows (JSON)`);
+    lines.push(JSON.stringify(ds.rows.slice(-lastN)));
+  }
+
   return lines.join("\n");
 }
