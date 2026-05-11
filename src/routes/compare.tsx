@@ -110,11 +110,14 @@ function ComparePage() {
                       {ds.rows.length} rows · {ds.columns.length} cols
                     </p>
                   </div>
+                  <Button variant="outline" size="sm" onClick={() => setPdfIndex(i)}>
+                    <FileText className="h-4 w-4" /> PDF
+                  </Button>
                   <Button variant="ghost" size="icon" onClick={() => remove(i)}>
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
-                <div className="[&_.grid]:grid-cols-1">
+                <div data-compare-charts={i} className="[&_.grid]:grid-cols-1">
                   <Charts dataset={ds} />
                 </div>
               </div>
@@ -122,6 +125,15 @@ function ComparePage() {
           </div>
         )}
       </main>
+
+      {pdfIndex !== null && datasets[pdfIndex] && (
+        <PdfPreviewDialog
+          open={pdfIndex !== null}
+          onOpenChange={(v) => !v && setPdfIndex(null)}
+          dataset={datasets[pdfIndex]}
+          chartsSelector={`[data-compare-charts="${pdfIndex}"]`}
+        />
+      )}
     </div>
   );
 }
