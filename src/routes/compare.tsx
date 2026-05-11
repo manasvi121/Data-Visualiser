@@ -22,6 +22,7 @@ export const Route = createFileRoute("/compare")({
 function ComparePage() {
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [loading, setLoading] = useState(false);
+  const [pdfIndex, setPdfIndex] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const onFiles = async (files: FileList | null) => {
