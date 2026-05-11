@@ -121,6 +121,7 @@ function ComparePage() {
                 <div data-compare-charts={i} className="[&_.grid]:grid-cols-1">
                   <Charts dataset={ds} />
                 </div>
+                <Chatbot dataset={ds} />
               </div>
             ))}
           </div>
