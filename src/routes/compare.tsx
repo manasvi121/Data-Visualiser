@@ -4,6 +4,7 @@ import { FileText, Loader2, Plus, Upload, X } from "lucide-react";
 import { NavBar } from "@/components/NavBar";
 import { Button } from "@/components/ui/button";
 import { Charts } from "@/components/Charts";
+import { Chatbot } from "@/components/Chatbot";
 import { PdfPreviewDialog } from "@/components/PdfPreviewDialog";
 import { cleanDataset, parseFile, type Dataset } from "@/lib/dataset";
 
