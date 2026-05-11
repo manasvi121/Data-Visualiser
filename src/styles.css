@@ -117,8 +117,8 @@
     color: transparent;
   }
   .glass {
-    background: oklch(0.12 0.03 285 / 0.6);
+    background: oklch(0.24 0.06 255 / 0.6);
     backdrop-filter: blur(12px);
-    border: 1px solid oklch(0.30 0.10 295 / 0.3);
+    border: 1px solid oklch(0.55 0.08 240 / 0.3);
   }
 }
